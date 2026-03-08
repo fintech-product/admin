@@ -1,0 +1,92 @@
+<div>
+  <header>
+    <h2>Careers</h2>
+    <div class="btn-group">
+      <button type="button" id="btnTable" name="btnTable" class="btn-table" data-view="table"></button>
+      {% if readonly == false %}<a id="btnNew" class="btn-new" href="/jobs/new"></a>{% endif %}
+    </div>
+  </header>
+  <div class="search-body">
+    <form id="jobsForm" name="jobsForm" class="form" novalidate>
+      <span class="hidden-message">{{message}}</span>
+      <section class="row search-group">{% include "partials/search.html" %} {% include "partials/pagination.html" %}
+      </section>
+      <section class="row search-group advance-search">
+        <label class="col s12 m6 auto-height">
+          {{resource.skills}}
+          <div class="chip-list" data-name="skills">{{generateTags(filter.skills)}}
+            <div class="chip-input-container">
+              <input type="text" id="txtSkill" name="txtSkill" data-skip="true" onkeydown="chipOnKeydown(event)" placeholder="Enter a skill..." />
+              <button type="button" id="btnAddSkill" name="btnAddSkill" class="btn-add" onclick="addChip(this)"></button>
+            </div>
+          </div>
+        </label>
+        <label class="col s12 m3">
+          {{resource.published_at_from}}
+          <input
+            type="datetime-local"
+            id="publishedAt_min"
+            name="publishedAt_min"
+            data-field="publishedAt.min"
+            value="{{datetimeToString(filter.publishedAt.min)}}"
+            step=".010"
+          />
+        </label>
+        <label class="col s12 m3">
+          {{resource.published_at_to}}
+          <input
+            type="datetime-local"
+            id="publishedAt_max"
+            name="publishedAt_max"
+            data-field="publishedAt.max"
+            value="{{datetimeToString(filter.publishedAt.max)}}"
+            step=".010"
+          />
+        </label>
+      </section>
+      <input type="hidden" id="page" name="page" value="{{filter.page}}" />
+    </form>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>{{resource.number}}</th>
+            <th data-field="id">
+              <a href="{{sort.id.url}}" onclick="navigate(event)">{{resource.id}} {{sort.id.tag}}</a>
+            </th>
+            <th data-field="title">
+              <a href="{{sort.title.url}}" onclick="navigate(event)">{{resource.title}} {{sort.title.tag}}</a>
+            </th>
+            <th data-field="publishedAt" class="datetime">
+              <a href="{{sort.publishedAt.url}}" onclick="navigate(event)">{{resource.published_at}} {{sort.publishedAt.tag}}</a>
+            </th>
+            <th data-field="position">
+              <a href="{{sort.position.url}}" onclick="navigate(event)">{{resource.position}} {{sort.position.tag}}</a>
+            </th>
+            <th data-field="quantity">
+              <a href="{{sort.quantity.url}}" onclick="navigate(event)">{{resource.quantity}} {{sort.quantity.tag}}</a>
+            </th>
+            <th data-field="location">
+              <a href="{{sort.location.url}}" onclick="navigate(event)">{{resource.location}} {{sort.location.tag}}</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in list %}
+          <tr>
+            <td class="text-right">{{item.sequence}}</td>
+            <td>
+              <a href="/jobs/{{item.id}}" onclick="navigate(event)">{{item.id}}</a>
+            </td>
+            <td>{{item.title}}</td>
+            <td>{{formatDateTime(item.publishedAt, dateFormat)}}</td>
+            <td>{{item.position}}</td>
+            <td class="text-right">{{formatNumber(item.quantity)}}</td>
+            <td>{{item.location}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

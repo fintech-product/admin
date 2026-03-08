@@ -1,0 +1,55 @@
+<form id="roleForm" name="roleForm" class="form" novalidate aria-readonly="{{readonly}}">
+  <header>
+    <button type="button" id="btnBack" name="btnBack" class="btn-back" onclick="goBack()"></button>
+    <h2>{{resource.role}}</h2>
+    <a class="btn-group btn-right" href="/roles/{{role.roleId}}/assign" onclick="navigate(event)"><i class="material-icons">group</i></a>
+  </header>
+  <div>
+    <section class="row section">
+      <label class="col s6 m6">
+        {{resource.role_id}}
+        <input
+          type="text"
+          id="roleId"
+          name="roleId"
+          value="{{role.roleId}}"
+          pattern="^(?=.*[a-z])[a-z0-9_]{1,100}$"
+          maxlength="20"
+          required
+        {% if editMode %}
+          readonly
+        {% endif %}
+          onblur="requiredOnBlur(event)"
+          placeholder="{{resource.role_id}}"
+        />
+      </label>
+      <label class="col s6 m6">
+        {{resource.role_name}}
+        <input
+          type="text"
+          id="roleName"
+          name="roleName"
+          value="{{role.roleName}}"
+          maxlength="255"
+          required
+          onblur="requiredOnBlur(event)"
+          placeholder="{{resource.role_name}}"
+        />
+      </label>
+      <label class="col s12 m6">
+        {{resource.remark}}
+        <input type="text" id="remark" name="remark" value="{{role.remark}}" maxlength="255" placeholder="{{resource.remark}}" />
+      </label>
+      <div class="col s12 m6 radio-section">
+        {{resource.status}}
+        <div class="radio-group">
+          <label><input type="radio" id="active" name="status" value="A" {{isChecked('A', role.status)}}>{{resource.active}}</label>
+          <label><input type="radio" id="inactive" name="status" value="I" {{isChecked('I', role.status)}}/>{{resource.inactive}}</label>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer>
+    <button type="submit" id="btnSave" name="btnSave" onclick="submitForm(event)" {% if readonly %} disabled {% endif %}>{{resource.save}}</button>
+  </footer>
+</form>

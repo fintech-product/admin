@@ -1,0 +1,44 @@
+<form id="roleAssignmentForm" name="roleAssignmentForm" class="form">
+  <header>
+    <button type="button" id="btnBack" name="btnBack" class="btn-back" onclick="goBack()"></button>
+    <h2>Role Assignment</h2>
+  </header>
+  <div>
+    <section class="row section">
+      <label class="col s12 m6">
+        {{resource.email}}
+        <input id="email" name="email" type="text" value="{{user.email}}" disabled placeholder="{{resource.email}}" />
+      </label>
+    </section>
+    <section class="list-container">
+      <ul class="row list">
+        <li class="col check-item header">
+          <input id="roleAssignmentForm_checkAll" type="checkbox" name="checkAll" />
+          <p>Check All</p>
+        </li>
+        {% for item in roles %}
+        <li class="col check-item">
+          <input type="checkbox" id="role_{{item.value}}" name="id" value="{{item.value}}" {% if item.selected %} checked {% endif %} />
+          <p>{{item.text}}</p>
+        </li>
+        {% endfor %}
+    </section>
+  </div>
+  <footer>
+    <button type="submit" id="btnSave" name="btnSave" onclick="assignRolesToUser(event)"
+        data-warning="{{resource.msg_confirm_assign_roles_to_user}}">
+      {{resource.save}}
+    </button>
+  </footer>
+  <script data-init-script="true">
+    resources.load = function (pageBody) {
+      var checkbox = document.getElementById("roleAssignmentForm_checkAll")
+      if (checkbox) {
+        checkbox.addEventListener("click", function (e) {
+          var target = e.target
+          checkAllOnClick(target, "id")
+        })
+      }
+    }
+  </script>
+</form>
