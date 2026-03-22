@@ -2,14 +2,14 @@
   <header>
     <h2>{{resource.roles}}</h2>
     <div class="btn-group">
-      <button type="button" id="btnListView" name="btnListView" class="btn-list" data-view="listview"></button>
-      {% if readonly == false %}<a id="btnNew" class="btn-new" href="/roles/new"></a>{% endif %}
+      <button type="button" id="listBtn" name="listBtn" class="btn-list" data-view="listview"></button>
+      {% if readonly == false %}<a id="newBtn" class="btn-new" href="/roles/new"></a>{% endif %}
     </div>
   </header>
   <div class="search-body">
     <form id="rolesForm" name="rolesForm" class="form" novalidate>
       <span class="hidden-message">{{message}}</span>
-      <section class="row search-group">{% include "partials/search.html" %} {% include "partials/pagination.html" %}</section>
+      <section class="row search-group">{% include "partials/advance-search.html" %} {% include "partials/pagination.html" %}</section>
       <section class="row search-group inline">
         <label class="col s12 m6">
           {{resource.status}}
@@ -31,16 +31,16 @@
           <tr>
             <th>{{resource.number}}</th>
             <th data-field="roleId">
-              <a id="sortRoleId" href="{{sort.roleId.url}}" onclick="navigate(event)">{{resource.role_id}} {{sort.roleId.tag}}</a>
+              <a id="roleIdSort" href="{{sort.roleId.url}}" onclick="navigate(event)">{{resource.role_id}} {{sort.roleId.tag}}</a>
             </th>
             <th data-field="roleName">
-              <a id="sortRoleName" href="{{sort.roleName.url}}" onclick="navigate(event)">{{resource.role_name}} {{sort.roleName.tag}}</a>
+              <a id="roleNameSort" href="{{sort.roleName.url}}" onclick="navigate(event)">{{resource.role_name}} {{sort.roleName.tag}}</a>
             </th>
             <th data-field="remark">
-              <a id="sortRemark" href="{{sort.remark.url}}" onclick="navigate(event)">{{resource.remark}} {{sort.remark.tag}}</a>
+              <a id="remarkSort" href="{{sort.remark.url}}" onclick="navigate(event)">{{resource.remark}} {{sort.remark.tag}}</a>
             </th>
             <th data-field="status">
-              <a id="sortStatus" href="{{sort.status.url}}" onclick="navigate(event)">{{resource.status}} {{sort.status.tag}}</a>
+              <a id="statusSort" href="{{sort.status.url}}" onclick="navigate(event)">{{resource.status}} {{sort.status.tag}}</a>
             </th>
           </tr>
         </thead>
