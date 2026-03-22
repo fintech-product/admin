@@ -18,31 +18,26 @@ import {
 import { write } from "security-express"
 import { validate } from "xvalidators"
 import { getLang, getResource } from "../resources"
-import { UserService } from "../shared/user"
 import { render, renderError403, renderError404, renderError500 } from "../template"
-import { Role, RoleFilter, roleModel, RoleService } from "./role"
+import { Locale, LocaleFilter, localeModel, LocaleService } from "./locale"
 
-const fields = ["roleId", "roleName", "remark", "status"]
-
-function createRole(): Role {
-  const role = {} as Role
-  role.status = "A"
-  return role
+function createLocale(): Locale {
+  const locale = {} as Locale
+  return locale
 }
-export class RoleController {
-  constructor(private service: RoleService, private userService: UserService) {
+const fields = ["id", "name", "path", "icon", "type", "resource", "parent", "sequence", "status"]
+export class LocaleController {
+  constructor(private service: LocaleService) {
     this.search = this.search.bind(this)
     this.view = this.view.bind(this)
     this.submit = this.submit.bind(this)
-    this.renderAssign = this.renderAssign.bind(this)
-    this.assign = this.assign.bind(this)
   }
   async search(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    let filter: RoleFilter = { limit: resources.defaultLimit }
+    let filter: LocaleFilter = { limit: resources.defaultLimit }
     if (hasSearch(req)) {
-      filter = fromRequest<RoleFilter>(req, ["status"])
+      filter = fromRequest<LocaleFilter>(req)
     }
     const { page, limit, sort } = filter
     const offset = getOffset(limit, page)
@@ -52,7 +47,7 @@ export class RoleController {
       const search = getSearch(req.url)
       const permissions = res.locals.permissions as number
       const readonly = write != (write & permissions)
-      render(req, res, "roles", {
+      render(req, res, "locales", {
         resource,
         readonly,
         limits: resources.limits,
@@ -78,23 +73,23 @@ export class RoleController {
       if (readonly) {
         return renderError403(req, res, resource)
       }
-      const role = createRole()
-      render(req, res, "role", {
+      const locale = createLocale()
+      render(req, res, "locale", {
         resource,
         editMode,
-        role: escape(role),
+        locale: escape(locale),
       })
     } else {
       try {
-        const role = await this.service.load(id)
-        if (!role) {
+        const locale = await this.service.load(id)
+        if (!locale) {
           return renderError404(req, res, resource)
         }
-        render(req, res, "role", {
+        render(req, res, "locale", {
           resource,
           readonly,
           editMode,
-          role: escape(role),
+          locale: escape(locale),
         })
       } catch (err) {
         renderError500(req, res, resource, err)
@@ -104,58 +99,26 @@ export class RoleController {
   async submit(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    const role = req.body as Role
-    const errors = validate<Role>(role, roleModel, resource)
+    const locale = req.body
+    const errors = validate<Locale>(locale, localeModel, resource)
     if (errors.length > 0) {
       return respondError(res, errors)
     }
     const userId = res.locals.userId
-    role.updatedBy = userId
+    locale.updatedBy = userId
     const id = req.params.id
     const editMode = id !== "new"
     try {
       if (!editMode) {
-        role.createdBy = userId
-        const result = await this.service.create(role)
+        locale.createdBy = userId
+        const result = await this.service.create(locale)
         const status = isSuccessful(result) ? 201 : 409
         res.status(status).json(result).end()
       } else {
-        const result = await this.service.update(role)
+        const result = await this.service.update(locale)
         const status = isSuccessful(result) ? 200 : 410
         res.status(status).json(result).end()
       }
-    } catch (err) {
-      handleError(err, res)
-    }
-  }
-  async renderAssign(req: Request, res: Response) {
-    const lang = getLang(req, res)
-    const resource = getResource(lang)
-    const id = req.params.id
-    try {
-      const role = await this.service.load(id)
-      if (!role) {
-        return renderError404(req, res, resource)
-      }
-      const permissions = res.locals.permissions as number
-      const readonly = write != (write & permissions)
-      const users = await this.userService.getUsersOfRole(id)
-      render(req, res, "role-assign", {
-        resource,
-        readonly,
-        role: escape(role),
-        users: escapeArray(users),
-      })
-    } catch (err) {
-      renderError500(req, res, resource, err)
-    }
-  }
-  async assign(req: Request, res: Response) {
-    const id = req.params.id
-    const roles = req.body as string[]
-    try {
-      await this.service.assign(id, roles)
-      res.status(204).end()
     } catch (err) {
       handleError(err, res)
     }

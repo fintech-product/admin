@@ -1,0 +1,108 @@
+<div>
+  <header>
+    <h2>{{resource.locales}}</h2>
+    {% if readonly == false %}<a id="newBtn" class="btn-new" href="/locales/new" onclick="navigate(event)"></a>{% endif %}
+  </header>
+  <div class="search-body">
+    <form id="localesForm" name="localesForm" class="form" novalidate>
+      <span class="hidden-message">{{message}}</span>
+      <section class="row search-group">{% include "partials/advance-search.html" %} {% include "partials/pagination.html" %}</section>
+      <section class="row search-group inline advance-search" hidden>
+        <label class="col s12 m6">
+          {{resource.currencyDecimalDigits}}
+          <input type="tel" id="currencyDecimalDigits" name="currencyDecimalDigits" value="{{filter.currencyDecimalDigits}}" maxlength="1" />
+        </label>
+        <label class="col s12 m6 checkbox-section">
+          {{resource.status}}
+          <section class="checkbox-group">
+            <label>
+              <input type="checkbox" id="active" name="status" value="A" {{isChecked('A', filter.status)}}/>{{resource.active}}
+            </label>
+            <label>
+              <input type="checkbox" id="inactive" name="status" value="I" {{isChecked('I', filter.status)}}/>{{resource.inactive}}
+            </label>
+          </section>
+        </label>
+      </section>
+      <input type="hidden" id="page" name="page" value="{{filter.page}}" />
+    </form>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>{{resource.number}}</th>
+            <th data-field="code">
+              <a id="codeSort" href="{{sort.code.url}}" onclick="navigate(event)">{{resource.locale_code}} {{sort.code.tag}}</a>
+            </th>
+            <th data-field="name">
+              <a id="nameSort" href="{{sort.name.url}}" onclick="navigate(event)">{{resource.locale_name}} {{sort.name.tag}}</a>
+            </th>
+            <th data-field="nativeName">
+              <a id="nativeNameSort" href="{{sort.nativeName.url}}" onclick="navigate(event)">{{resource.locale_native_name}} {{sort.nativeName.tag}}</a>
+            </th>
+            <th data-field="countryName">
+              <a id="countryNameSort" href="{{sort.countryName.url}}" onclick="navigate(event)">{{resource.country_name}} {{sort.countryName.tag}}</a>
+            </th>
+            <th data-field="nativeCountryName">
+              <a id="countryNameSort" href="{{sort.nativeCountryName.url}}" onclick="navigate(event)">{{resource.country_native_name}} {{sort.nativeCountryName.tag}}</a>
+            </th>
+            <th data-field="dateFormat">
+              <a id="dateFormatSort" href="{{sort.dateFormat.url}}" onclick="navigate(event)">{{resource.date_format}} {{sort.dateFormat.tag}}</a>
+            </th>
+            <th data-field="firstDayOfWeek">
+              <a id="firstDayOfWeekSort" href="{{sort.firstDayOfWeek.url}}" onclick="navigate(event)">{{resource.first_day_of_week}} {{sort.firstDayOfWeek.tag}}</a>
+            </th>
+            <th data-field="decimalSeparator">
+              <a id="decimalSeparatorSort" href="{{sort.decimalSeparator.url}}" onclick="navigate(event)">{{resource.decimal_separator}} {{sort.decimalSeparator.tag}}</a>
+            </th>
+            <th data-field="groupSeparator">
+              <a id="groupSeparatorSort" href="{{sort.groupSeparator.url}}" onclick="navigate(event)">{{resource.group_separator}} {{sort.groupSeparator.tag}}</a>
+            </th>
+            <th data-field="currencyCode">
+              <a id="currencyCodeSort" href="{{sort.currencyCode.url}}" onclick="navigate(event)">{{resource.currency_code}} {{sort.currencyCode.tag}}</a>
+            </th>
+            <th data-field="currencySymbol">
+              <a id="currencySymbolSort" href="{{sort.currencySymbol.url}}" onclick="navigate(event)">{{resource.currency_symbol}} {{sort.currencySymbol.tag}}</a>
+            </th>
+            <th data-field="currencyPattern">
+              <a id="currencyPatternSort" href="{{sort.currencyPattern.url}}" onclick="navigate(event)">{{resource.currency_pattern}} {{sort.currencyPattern.tag}}</a>
+            </th>
+            <th data-field="currencyDecimalDigits">
+              <a id="currencyDecimalDigitsSort" href="{{sort.currencyDecimalDigits.url}}" onclick="navigate(event)">{{resource.currency_decimal_digits}} {{sort.currencyDecimalDigits.tag}}</a>
+            </th>
+            <th data-field="currencySample">
+              <a id="currencySampleSort" href="{{sort.currencySample.url}}" onclick="navigate(event)">{{resource.currency_sample}} {{sort.currencySample.tag}}</a>
+            </th>
+            <th data-field="status">
+              <a id="statusSort" href="{{sort.status.url}}" onclick="navigate(event)">{{resource.status}} {{sort.status.tag}}</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in list %}
+          <tr>
+            <td class="text-right">{{item.sequence}}</td>
+            <td>
+              <a href="/locales/{{item.code}}" onclick="navigate(event)">{{item.code}}</a>
+            </td>
+            <td>{{item.name}}</td>
+            <td>{{item.nativeName}}</td>
+            <td>{{item.countryName}}</td>
+            <td>{{item.nativeCountryName}}</td>
+            <td>{{item.dateFormat}}</td>
+            <td class="text-right">{{item.firstDayOfWeek}}</td>
+            <td>{{item.decimalSeparator}}</td>
+            <td>{{item.groupSeparator}}</td>
+            <td>{{item.currencyCode}}</td>
+            <td>{{item.currencySymbol}}</td>
+            <td class="text-right">{{item.currencyDecimalDigits}}</td>
+            <td class="text-right">{{item.currencyPattern}}</td>
+            <td>{{item.currencySample}}</td>
+            <td>{{item.status}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

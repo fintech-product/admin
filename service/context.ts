@@ -11,6 +11,9 @@ import { check } from "types-validation"
 import { createValidator } from "xvalidators"
 import { AuditLogController, useAuditLogController } from "./audit-log"
 import { LoginController } from "./authentication"
+import { CountryController, useCountryController } from "./country"
+import { CurrencyController, useCurrencyController } from "./currency"
+import { LocaleController, useLocaleController } from "./locale"
 import { getResourceByLang } from "./resources"
 import { RoleController, useRoleController } from "./role"
 import { useUserService } from "./shared/user"
@@ -39,6 +42,9 @@ export interface Context {
   role: RoleController
   user: UserController
   auditLog: AuditLogController
+  currency: CurrencyController
+  country: CountryController
+  locale: LocaleController
 }
 
 export class Comparator {
@@ -86,6 +92,9 @@ export function useContext(db: DB, logger: Logger, midLogger: Middleware, cfg: C
   const role = useRoleController(db, userService, mapper)
   const user = useUserController(db, mapper)
   const auditLog = useAuditLogController(db)
+  const currency = useCurrencyController(db)
+  const country = useCountryController(db)
+  const locale = useLocaleController(db)
 
-  return { health, log, middleware, authorize: authorizer.authorize, menu, login, role, user, auditLog }
+  return { health, log, middleware, authorize: authorizer.authorize, menu, login, role, user, auditLog, currency, country, locale }
 }

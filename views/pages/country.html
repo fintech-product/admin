@@ -1,0 +1,172 @@
+<form id="countryForm" name="countryForm" class="form" novalidate aria-readonly="{{readonly}}">
+  <header>
+    <button type="button" id="backBtn" name="backBtn" class="btn-back" onclick="goBack()"></button>
+    <h2>{{resource.country}}</h2>
+  </header>
+  <div class="row">
+    <label class="col s12 m6">
+      {{resource.country_code}}
+      <input
+        type="text"
+        id="countryCode"
+        name="countryCode"
+        value="{{country.countryCode}}"
+      {% if editMode %}
+        readonly
+      {% endif %}
+        maxlength="2"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.country_code}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.country_name}}
+      <input
+        type="text"
+        id="countryName"
+        name="countryName"
+        value="{{country.countryName}}"
+        maxlength="100"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.country_name}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.country_native_name}}
+      <input
+        type="text"
+        id="nativeCountryName"
+        name="nativeCountryName"
+        value="{{country.nativeCountryName}}"
+        maxlength="100"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.country_native_name}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.date_format}}
+      <input
+        type="text"
+        id="dateFormat"
+        name="dateFormat"
+        value="{{country.dateFormat}}"
+        maxlength="13"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.date_format}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.decimal_separator}}
+      <input
+        type="text"
+        id="decimalSeparator"
+        name="decimalSeparator"
+        value="{{country.decimalSeparator}}"
+        maxlength="1"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.decimal_separator}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.group_separator}}
+      <input
+        type="text"
+        id="groupSeparator"
+        name="groupSeparator"
+        value="{{country.groupSeparator}}"
+        maxlength="1"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.group_separator}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.currency_code}}
+      <input
+        type="text"
+        id="currencyCode"
+        name="currencyCode"
+        value="{{country.currencyCode}}"
+        maxlength="3"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.currency_code}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.currency_symbol}}
+      <input
+        type="text"
+        id="currencySymbol"
+        name="currencySymbol"
+        value="{{country.currencySymbol}}"
+        maxlength="4"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.currency_symbol}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.currency_decimal_digits}}
+      <input
+        type="tel"
+        id="currencyDecimalDigits"
+        name="currencyDecimalDigits"
+        class="text-right"
+        value="{{country.currencyDecimalDigits}}"
+        maxlength="1"
+        required
+        onkeypress="return integerOnKeyPress(event)"
+        onfocus="numberOnFocus(event)"
+        onblur="numberOnBlur(event)"
+        placeholder="{{resource.currency_decimal_digits}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.currency_pattern}}
+      <input
+        type="tel"
+        id="currencyPattern"
+        name="currencyPattern"
+        class="text-right"
+        value="{{country.currencyPattern}}"
+        maxlength="1"
+        min="0"
+        max="3"
+        required
+        onkeypress="return integerOnKeyPress(event)"
+        onfocus="numberOnFocus(event)"
+        onblur="numberOnBlur(event)"
+        placeholder="{{resource.currency_pattern}}"
+      />
+    </label>
+    <label class="col s12 m6">
+      {{resource.currency_sample}}
+      <input
+        type="text"
+        id="currencySample"
+        name="currencySample"
+        value="{{country.currencySample}}"
+        maxlength="16"
+        required
+        onblur="requiredOnBlur(event)"
+        placeholder="{{resource.currency_sample}}"
+      />
+    </label>
+    <div class="col s12 m6 radio-section">
+      {{resource.status}}
+      <div class="radio-group">
+        <label><input type="radio" id="active" name="status" value="A" {{isChecked('A', country.status)}}/>{{resource.active}}</label>
+        <label><input type="radio" id="inactive" name="status" value="I" {{isChecked('I', country.status)}}/>{{resource.inactive}}</label>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <button type="submit" id="saveBtn" name="saveBtn" onclick="submitForm(event)" {% if readonly %} disabled {% endif %}>{{resource.save}}</button>
+  </footer>
+</form>

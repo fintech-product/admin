@@ -177,7 +177,7 @@ insert into role_modules(role_id, module_id, permissions) values ('finance_appro
 insert into role_modules(role_id, module_id, permissions) values ('finance_approver', 'currency', 9);
 
 
-insert into users (user_id,username,email,display_name,image_url,status,gender,phone,title,position) values ('aft2KNdQhi','gareth.bale','gareth.bale@gmail.com','Gareth Bale','https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Liver-RM_%282%29_%28cropped%29.jpg/440px-Liver-RM_%282%29_%28cropped%29.jpg','A','M','0987654321','Mr','M');
+insert into users (user_id,username,email,display_name,image_url,status,gender,phone,title,position) values ('aft2KNdQhi','gareth.bale','gareth.bale@gmail.com','Gareth Bale','https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/2022_FIFA_World_Cup_United_States_1%E2%80%931_Wales_-_%2832%29_%28cropped%29.jpg/250px-2022_FIFA_World_Cup_United_States_1%E2%80%931_Wales_-_%2832%29_%28cropped%29.jpg','A','M','0987654321','Mr','M');
 insert into users (user_id,username,email,display_name,image_url,status,gender,phone,title,position) values ('al6TZ0p4iE','cristiano.ronaldo','cristiano.ronaldo@gmail.com','Cristiano Ronaldo','https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/400px-Cristiano_Ronaldo_2018.jpg','I','M','0987654321','Mr','E');
 insert into users (user_id,username,email,display_name,image_url,status,gender,phone,title,position) values ('bkbH1PHu9O','james.rodriguez','james.rodriguez@gmail.com','James Rodríguez','https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/James_Rodriguez_2018.jpg/440px-James_Rodriguez_2018.jpg','A','M','0987654321','Mr','E');
 insert into users (user_id,username,email,display_name,image_url,status,gender,phone,title,position) values ('bL7sQBeO5m','zinedine.zidane','zinedine.zidane@gmail.com','Zinedine Zidane','https://upload.wikimedia.org/wikipedia/commons/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg','A','M','0987654321','Mr','E');
@@ -652,7 +652,7 @@ insert into locale (code,country_code,country_name,native_country_name,"name",na
 ('ug-CN','CN','People''s Republic of China','جۇڭخۇا خەلق جۇمھۇرىيىتى','Uyghur (PRC)','ئۇيغۇرچە (جۇڭخۇا خەلق جۇمھۇرىيىتى)','yyyy-M-d',1,'.',',',2,'CNY',0,'¥10,000.00'),
 ('uk-UA','UA','Ukraine','Україна','Ukrainian (Ukraine)','українська (Україна)','dd.MM.yyyy',2,',',' ',2,'UAH',1,'10 000,00₴'),
 ('ur-PK','PK','Islamic Republic of Pakistan','پاکستان','Urdu (Islamic Republic of Pakistan)','اُردو (پاکستان)','dd/MM/yyyy',2,'.',',',2,'PKR',0,'Rs10,000.00'),
-('uz-Cyrl-UZ','UZ','Uzbekistan','Ўзбекистон Республикаси','Uzbek (Cyrillic, Uzbekistan)','Ўзбек (Ўзбекистон)','dd.MM.yyyy',2,',',' ',2,'UZS',3,'10 000,00 сўм'),
+('uz-Cyrl-UZ','UZ','Uzbekistan','Ўзбекистон Республикаси','Uzbek (Cyrillic, Uzbekistan)','Ўзбек (Ўзбекистон)','dd.MM.yyyy',2,',',' ',2,'UZS',3,'10 000 сўм'),
 ('uz-Latn-UZ','UZ','Uzbekistan','U''zbekiston Respublikasi','Uzbek (Latin, Uzbekistan)','U''zbek (U''zbekiston Respublikasi)','dd/MM yyyy',2,',',' ',0,'UZS',3,'10 000 so''m');
 insert into locale (code,country_code,country_name,native_country_name,"name",native_name,date_format,first_day_of_week,decimal_separator,group_separator,currency_decimal_digits,currency_code,currency_pattern,currency_sample) VALUES
 ('vi-VN','VN','Vietnam','Việt Nam','Vietnamese (Vietnam)','Tiếng Việt (Việt Nam)','dd/MM/yyyy',2,',','.',2,'VND',3,'10.000,00 ₫'),

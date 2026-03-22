@@ -52,10 +52,7 @@ export class UserController {
   async search(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    let filter: UserFilter = {
-      q: "",
-      limit: resources.defaultLimit,
-    }
+    let filter: UserFilter = { limit: resources.defaultLimit }
     if (hasSearch(req)) {
       filter = fromRequest<UserFilter>(req, ["status"])
     }

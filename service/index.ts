@@ -35,4 +35,22 @@ export function route(app: Application, ctx: Context): void {
 
   const readAuditLog = ctx.authorize("audit_log", read)
   app.get("/audit-logs", readAuditLog, ctx.menu.build, ctx.auditLog.render)
+
+  const readCurrency = ctx.authorize("currency", read)
+  const writeCurrency = ctx.authorize("currency", write)
+  app.get("/currencies", readCurrency, ctx.menu.build, ctx.currency.search)
+  app.get("/currencies/:id", readCurrency, ctx.menu.build, ctx.currency.view)
+  app.post("/currencies/:id", writeCurrency, json(), ctx.currency.submit)
+
+  const readCountry = ctx.authorize("country", read)
+  const writeCountry = ctx.authorize("country", write)
+  app.get("/countries", readCountry, ctx.menu.build, ctx.country.search)
+  app.get("/countries/:id", readCountry, ctx.menu.build, ctx.country.view)
+  app.post("/countries/:id", writeCountry, json(), ctx.country.submit)
+
+  const readLocale = ctx.authorize("locale", read)
+  const writeLocale = ctx.authorize("locale", write)
+  app.get("/locales", readLocale, ctx.menu.build, ctx.locale.search)
+  app.get("/locales/:id", readLocale, ctx.menu.build, ctx.locale.view)
+  app.post("/locales/:id", writeLocale, json(), ctx.locale.submit)
 }

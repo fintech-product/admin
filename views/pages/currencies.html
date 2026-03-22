@@ -1,14 +1,18 @@
 <div>
   <header>
-    <h2>{{resource.roles}}</h2>
-    {% if readonly == false %}<a id="newBtn" class="btn-new" href="/roles/new" onclick="navigate(event)"></a>{% endif %}
+    <h2>{{resource.currencies}}</h2>
+    {% if readonly == false %}<a id="newBtn" class="btn-new" href="/currencies/new" onclick="navigate(event)"></a>{% endif %}
   </header>
   <div class="search-body">
-    <form id="rolesForm" name="rolesForm" class="form" novalidate>
+    <form id="currenciesForm" name="currenciesForm" class="form" novalidate>
       <span class="hidden-message">{{message}}</span>
       <section class="row search-group">{% include "partials/advance-search.html" %} {% include "partials/pagination.html" %}</section>
-      <section class="row search-group inline" hidden>
+      <section class="row search-group inline advance-search" hidden>
         <label class="col s12 m6">
+          {{resource.currency_decimal_digits}}
+          <input type="tel" id="decimalDigits" name="decimalDigits" value="{{filter.decimalDigits}}" maxlength="1" />
+        </label>
+        <label class="col s12 m6 checkbox-section">
           {{resource.status}}
           <section class="checkbox-group">
             <label>
@@ -27,14 +31,14 @@
         <thead>
           <tr>
             <th>{{resource.number}}</th>
-            <th data-field="roleId">
-              <a id="roleIdSort" href="{{sort.roleId.url}}" onclick="navigate(event)">{{resource.role_id}} {{sort.roleId.tag}}</a>
+            <th data-field="code">
+              <a id="codeSort" href="{{sort.code.url}}" onclick="navigate(event)">{{resource.currency_code}} {{sort.code.tag}}</a>
             </th>
-            <th data-field="roleName">
-              <a id="roleNameSort" href="{{sort.roleName.url}}" onclick="navigate(event)">{{resource.role_name}} {{sort.roleName.tag}}</a>
+            <th data-field="symbol">
+              <a id="symbolSort" href="{{sort.symbol.url}}" onclick="navigate(event)">{{resource.currency_symbol}} {{sort.symbol.tag}}</a>
             </th>
-            <th data-field="remark">
-              <a id="remarkSort" href="{{sort.remark.url}}" onclick="navigate(event)">{{resource.remark}} {{sort.remark.tag}}</a>
+            <th data-field="decimalDigits">
+              <a id="decimalDigitsSort" href="{{sort.decimalDigits.url}}" onclick="navigate(event)">{{resource.currency_decimal_digits}} {{sort.decimalDigits.tag}}</a>
             </th>
             <th data-field="status">
               <a id="statusSort" href="{{sort.status.url}}" onclick="navigate(event)">{{resource.status}} {{sort.status.tag}}</a>
@@ -46,10 +50,10 @@
           <tr>
             <td class="text-right">{{item.sequence}}</td>
             <td>
-              <a href="/roles/{{item.roleId}}" onclick="navigate(event)">{{item.roleId}}</a>
+              <a href="/currencies/{{item.code}}" onclick="navigate(event)">{{item.code}}</a>
             </td>
-            <td>{{item.roleName}}</td>
-            <td>{{item.remark}}</td>
+            <td>{{item.symbol}}</td>
+            <td class="text-right">{{item.decimalDigits}}</td>
             <td>{{item.status}}</td>
           </tr>
           {% endfor %}

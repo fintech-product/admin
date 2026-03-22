@@ -32,4 +32,7 @@ export const vi = {
   audit_log_time_from: "Date time from",
   audit_log_time_to: "Date time to",
   audit_log_user: "Performed by",
+
+  msg_confirm_assign_roles_to_user: "You do not assign any role to this user. Are you sure you want to save?",
+  msg_confirm_assign_users_to_role: "You do not assign any user to this role. Are you sure you want to save?",
 }
