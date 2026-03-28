@@ -39,9 +39,12 @@
         type="tel"
         id="decimalDigits"
         name="decimalDigits"
+        data-type="integer"
         class="text-right"
         value="{{currency.decimalDigits}}"
         maxlength="1"
+        min="0"
+        max="4"
         required
         onkeypress="return integerOnKeyPress(event)"
         onfocus="numberOnFocus(event)"
