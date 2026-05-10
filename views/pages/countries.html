@@ -12,7 +12,15 @@
       </section>
       <section class="row search-group inline advance-search" hidden>
         <label class="col s12 m6">
-          {{resource.currencyDecimalDigits}}
+          {{resource.decimal_separator}}
+          <input type="text" id="decimalSeparator" name="decimalSeparator" value="{{filter.decimalSeparator}}" maxlength="1" />
+        </label>
+        <label class="col s12 m6">
+          {{resource.group_separator}}
+          <input type="text" id="groupSeparator" name="groupSeparator" value="{{filter.decimalSegroupSeparatorarator}}" maxlength="1" />
+        </label>
+        <label class="col s12 m6">
+          {{resource.currency_decimal_digits}}
           <input type="tel" id="currencyDecimalDigits" name="currencyDecimalDigits" value="{{filter.currencyDecimalDigits}}" maxlength="1" />
         </label>
         <label class="col s12 m6 checkbox-section">
