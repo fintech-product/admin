@@ -110,8 +110,7 @@ table tbody tr:hover {
 }
 
 /* bootstrap-override */
-table a {
-  cursor: pointer;
+table td a {
   text-decoration: underline;
 }
 
