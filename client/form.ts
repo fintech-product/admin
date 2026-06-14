@@ -1,6 +1,3 @@
-const r1 = / |,|\$|€|£|¥|'|٬|،| /g
-const r2 = / |\.|\$|€|£|¥|'|٬|،| /g
-
 function parseDate(v: string, format?: string): Date {
   if (!format || format.length === 0) {
     format = "MM/DD/YYYY"
@@ -40,7 +37,7 @@ function getDecimalSeparator(ele: HTMLInputElement): string {
   }
   return separator ? separator : "."
 }
-function getGroupSeparator(ele: HTMLInputElement): string {
+function getGroupSeparator(ele: HTMLInputElement): string | null | undefined {
   let separator = ele.getAttribute("data-group-separator")
   if (!separator) {
     const form = ele.form
@@ -48,7 +45,7 @@ function getGroupSeparator(ele: HTMLInputElement): string {
       separator = form.getAttribute("data-group-separator")
     }
   }
-  return separator === "." ? "." : ","
+  return separator
 }
 
 const d = "data-value"
@@ -61,96 +58,71 @@ function selectOnChange(ele: HTMLSelectElement, attr?: string): void {
   }
 }
 //detect Ctrl + [a, v, c, x]
-function detectCtrlKeyCombination(e: KeyboardEvent) {
-  // list all CTRL + key combinations
-  var forbiddenKeys = new Array("v", "a", "x", "c")
-  var key
-  var isCtrl
-  var browser = navigator.appName
+const CTRL_KEYS = {
+  a: true,
+  c: true,
+  v: true,
+  x: true,
+} as const
 
-  if (browser == "Microsoft Internet Explorer") {
-    key = e.keyCode
-    // IE
-    if (e.ctrlKey) {
-      isCtrl = true
-    } else {
-      isCtrl = false
-    }
-  } else {
-    if (browser == "Netscape") {
-      key = e.which
-      // firefox, Netscape
-      if (e.ctrlKey) isCtrl = true
-      else isCtrl = false
-    } else return true
-  }
+function digitOnKeyPress(e: KeyboardEvent): boolean {
+  const key = e.key
 
-  // if ctrl is pressed check if other key is in forbidenKeys array
-  if (isCtrl) {
-    var chr = String.fromCharCode(key).toLowerCase()
-    for (let i = 0; i < forbiddenKeys.length; i++) {
-      if (forbiddenKeys[i] == chr) {
-        return true
-      }
-    }
-  }
-  return false
-}
-function digitOnKeyPress(e: KeyboardEvent) {
-  if (detectCtrlKeyCombination(e)) {
+  if ((e.ctrlKey && CTRL_KEYS[key.toLowerCase() as keyof typeof CTRL_KEYS]) || key === "Enter" || key === "Backspace" || key === "Tab" || key === "Delete") {
     return true
   }
-  const key = window.event ? (e as any).keyCode : (e as any).which
-  if (key == 13 || key == 8 || key == 9 || key == 11 || key == 127 || key == "\t") {
-    return key
-  }
-  var keychar = String.fromCharCode(key)
-  var reg = /\d/
-  return reg.test(keychar)
+
+  return key.length === 1 && key >= "0" && key <= "9"
 }
-function integerOnKeyPress(e: KeyboardEvent) {
-  if (detectCtrlKeyCombination(e)) {
+
+function integerOnKeyPress(e: KeyboardEvent): boolean {
+  const key = e.key
+
+  if ((e.ctrlKey && CTRL_KEYS[key.toLowerCase() as keyof typeof CTRL_KEYS]) || key === "Enter" || key === "Backspace" || key === "Tab" || key === "Delete") {
     return true
   }
-  const key = window.event ? (e as any).keyCode : (e as any).which
-  if (key == 13 || key == 8 || key == 9 || key == 11 || key == 127 || key == "\t") {
-    return key
-  }
-  var ele = e.target as HTMLInputElement
-  var keychar = String.fromCharCode(key)
-  if (keychar == "-") {
-    if (ele.value.indexOf("-") >= 0 || isNaN(ele.min as any) || parseInt(ele.min) >= 0) {
-      return false
+
+  const input = e.target as HTMLInputElement
+
+  if (key === "-") {
+    if (input.min) {
+      const min = Number(input.min)
+      return !Number.isNaN(min) && min < 0 && !input.value.includes("-")
     }
-    return key
+    if (input.max) {
+      const max = Number(input.max)
+      return !Number.isNaN(max) && max < 0 && !input.value.includes("-")
+    }
   }
-  var reg = /\d/
-  return reg.test(keychar)
+
+  return key.length === 1 && key >= "0" && key <= "9"
 }
+
 function numberOnKeyPress(e: KeyboardEvent) {
-  if (detectCtrlKeyCombination(e)) {
+  const key = e.key
+
+  if ((e.ctrlKey && CTRL_KEYS[key.toLowerCase() as keyof typeof CTRL_KEYS]) || key === "Enter" || key === "Backspace" || key === "Tab" || key === "Delete") {
     return true
   }
-  const key = window.event ? (e as any).keyCode : (e as any).which
-  if (key == 13 || key == 8 || key == 9 || key == 11 || key == 127 || key == "\t") {
-    return key
-  }
-  var ele = e.target as HTMLInputElement
-  var keychar = String.fromCharCode(key)
-  if (keychar == "-") {
-    if (ele.value.indexOf("-") >= 0 || isNaN(ele.min as any) || parseInt(ele.min) >= 0) {
-      return false
+
+  const input = e.target as HTMLInputElement
+
+  if (key === "-") {
+    if (input.min) {
+      const min = Number(input.min)
+      return !Number.isNaN(min) && min < 0 && !input.value.includes("-")
     }
-    return key
-  }
-  if (keychar == "." || keychar == ",") {
-    if (ele.value.indexOf(keychar) >= 0 || keychar !== getDecimalSeparator(ele)) {
-      return false
+    if (input.max) {
+      const max = Number(input.max)
+      return !Number.isNaN(max) && max < 0 && !input.value.includes("-")
     }
-    return key
   }
-  var reg = /\d/
-  return reg.test(keychar)
+  if (key === "." || key === "," || key === "٫") {
+    const separator = getDecimalSeparator(input)
+    return key === separator && !input.value.includes(separator)
+  }
+
+  return key.length === 1 && key >= "0" && key <= "9"
 }
 function trimTime(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate())
@@ -160,74 +132,64 @@ function addDays(d: Date, n: number): Date {
   newDate.setDate(newDate.getDate() + n)
   return newDate
 }
-function formatDate(d: Date | null | undefined, dateFormat?: string, full?: boolean, upper?: boolean): string {
-  if (!d) {
+function formatDate(d: Date | null | undefined, format?: string): string {
+  if (!d || !format) {
     return ""
   }
-  let format = dateFormat && dateFormat.length > 0 ? dateFormat : "M/D/YYYY"
-  if (upper) {
-    format = format.toUpperCase()
-  }
-  let arr = ["", "", ""]
-  const items = format.split(/\/|\.| |-/)
-  let iday = items.indexOf("D")
-  let im = items.indexOf("M")
-  let iyear = items.indexOf("YYYY")
-  let fm = full ? full : false
-  let fd = full ? full : false
-  let fy = true
-  if (iday === -1) {
-    iday = items.indexOf("DD")
-    fd = true
-  }
-  if (im === -1) {
-    im = items.indexOf("MM")
-    fm = true
-  }
-  if (iyear === -1) {
-    iyear = items.indexOf("YY")
-    fy = full ? full : false
-  }
-  arr[iday] = getD(d.getDate(), fd)
-  arr[im] = getD(d.getMonth() + 1, fm)
-  arr[iyear] = getYear(d.getFullYear(), fy)
-  const s = detectSeparator(format)
-  const e = detectLastSeparator(format)
-  const l = items.length === 4 ? format[format.length - 1] : ""
-  return arr[0] + s + arr[1] + e + arr[2] + l
-}
-function detectSeparator(format: string): string {
-  const len = format.length
-  for (let i = 0; i < len; i++) {
-    const c = format[i]
-    if (!((c >= "A" && c <= "Z") || (c >= "a" && c <= "z"))) {
-      return c
+  const y = d.getFullYear()
+  const m = d.getMonth() + 1
+  const day = d.getDate()
+
+  let out = ""
+  let i = 0
+
+  while (i < format.length) {
+    const c = format.charCodeAt(i)
+
+    // yyyy / yy
+    if (c === 121 /* y */) {
+      const len = count(format, i, 121)
+      if (len >= 4) {
+        out += y.toString()
+        i += 4
+      } else {
+        out += shortYear(y)
+        i += 2
+      }
+      continue
     }
-  }
-  return "/"
-}
-function detectLastSeparator(format: string): string {
-  const len = format.length - 3
-  for (let i = len; i > -0; i--) {
-    const c = format[i]
-    if (!((c >= "A" && c <= "Z") || (c >= "a" && c <= "z"))) {
-      return c
+
+    // MM / M
+    if (c === 77 /* M */) {
+      const len = count(format, i, 77)
+      out += len >= 2 ? pad(m) : m.toString()
+      i += len >= 2 ? 2 : 1
+      continue
     }
+
+    // dd / d
+    if (c === 100 /* d */) {
+      const len = count(format, i, 100)
+      out += len >= 2 ? pad(day) : day.toString()
+      i += len >= 2 ? 2 : 1
+      continue
+    }
+
+    // literal char
+    out += format[i]
+    i++
   }
-  return "/"
+  return out
 }
-function getYear(y: number, full?: boolean): string {
-  if (full || (y <= 99 && y >= -99)) {
-    return y.toString()
+function shortYear(y: number): string {
+  return ((y % 100) + 100) % 100 < 10 ? "0" + (((y % 100) + 100) % 100) : "" + (((y % 100) + 100) % 100)
+}
+function count(s: string, i: number, ch: number): number {
+  let n = 0
+  while (i + n < s.length && s.charCodeAt(i + n) === ch) {
+    n++
   }
-  const s = y.toString()
-  return s.substring(s.length - 2)
-}
-function getD(n: number, fu: boolean): string {
-  return fu ? pad(n) : n.toString()
-}
-function formatLongTime(d: Date): string {
-  return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+  return n
 }
 function pad(n: number): string {
   return n < 10 ? "0" + n : n.toString()
@@ -238,15 +200,46 @@ function pad3(n: number): string {
   }
   return n < 10 ? "00" + n : "0" + n.toString()
 }
-function formatLongDateTime(date: Date | null | undefined, dateFormat?: string, full?: boolean, upper?: boolean): string {
+const et = ""
+function formatDateTime(date: Date | null | undefined, dateFormat?: string): any {
   if (!date) {
-    return ""
+    return et
   }
-  const sd = formatDate(date, dateFormat, full, upper)
+  const sd = formatDate(date, dateFormat)
+  if (sd.length === 0) {
+    return sd
+  }
+  return sd + " " + formatTime(date)
+}
+function formatLongDateTime(date: Date | null | undefined, dateFormat?: string): any {
+  if (!date) {
+    return et
+  }
+  const sd = formatDate(date, dateFormat)
   if (sd.length === 0) {
     return sd
   }
   return sd + " " + formatLongTime(date)
+}
+function formatFullDateTime(date: Date | null | undefined, dateFormat?: string, s?: string): any {
+  if (!date) {
+    return et
+  }
+  const sd = formatDate(date, dateFormat)
+  if (sd.length === 0) {
+    return sd
+  }
+  return sd + " " + formatFullTime(date, s)
+}
+function formatTime(d: Date): string {
+  return pad(d.getHours()) + ":" + pad(d.getMinutes())
+}
+function formatLongTime(d: Date): string {
+  return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds())
+}
+function formatFullTime(d: Date, s?: string): string {
+  const se = s && s.length > 0 ? s : "."
+  return formatLongTime(d) + se + pad3(d.getMilliseconds())
 }
 
 function getValue(form: HTMLFormElement | null | undefined, name: string): string | null {
@@ -323,7 +316,76 @@ function setKey(_object: any, _isArrayKey: boolean, _key: string, _nextValue: an
   return _object
 }
 
-function decodeFromElement<T>(parent: HTMLElement | null | undefined, fields: string[], currencySymbol?: string | null): T {
+function normalizePhone(s?: string | null): string {
+  if (!s) {
+    return ""
+  }
+  const len = s.length
+  const buf = new Array<string>(len)
+  let j = 0
+  for (let i = 0; i < len; i++) {
+    const c = s.charCodeAt(i)
+    if ((c >= 48 && c <= 57) || c === 43) {
+      buf[j++] = s[i]
+    }
+  }
+  return j === len ? buf.join("") : buf.slice(0, j).join("")
+}
+function normalizeInteger(s?: string | null): string {
+  if (!s) {
+    return ""
+  }
+  const len = s.length
+  const buf = new Array<string>(len)
+  let j = 0
+  for (let i = 0; i < len; i++) {
+    const c = s.charCodeAt(i)
+    if ((c >= 48 && c <= 57) || c === 45) {
+      buf[j++] = s[i]
+    }
+  }
+  return j === len ? buf.join("") : buf.slice(0, j).join("")
+}
+
+// Keep a single dot
+function removeSeparators(s?: string | null): string {
+  if (!s) {
+    return ""
+  }
+  const len = s.length
+  const buffer = new Uint16Array(len) // preallocate max possible
+  let write = 0
+
+  for (let i = 0; i < len; i++) {
+    const c = s.charCodeAt(i)
+    // '0'–'9' (48–57), '-' (45), '.' (46)
+    if ((c >= 48 && c <= 57) || c === 45 || c === 46) {
+      buffer[write++] = c
+    }
+  }
+  // Convert only the used portion to string
+  return String.fromCharCode.apply(null, buffer.subarray(0, write) as any)
+}
+// Keep digits 0–9 ; Replace , and ٫ (Arabic decimal separator) → . ; Remove everything else => < 100 char: Array<string> version can actually be just as fast or faster due to lower overhead
+function normalizeNumber(s?: string | null): string {
+  if (!s) {
+    return ""
+  }
+  const len = s.length
+  const buf = new Array<string>(len)
+  let j = 0
+  for (let i = 0; i < len; i++) {
+    const c = s.charCodeAt(i)
+
+    if ((c >= 48 && c <= 57) || c === 45) {
+      buf[j++] = s[i]
+    } else if (c === 44 || c === 1643) {
+      buf[j++] = "."
+    }
+  }
+  return j === len ? buf.join("") : buf.slice(0, j).join("")
+}
+function decodeFromElement<T>(parent: HTMLElement | null | undefined, fields: string[]): T {
   const obj = {} as any
   if (parent) {
     for (const field of fields) {
@@ -345,22 +407,26 @@ function decodeFromElement<T>(parent: HTMLElement | null | undefined, fields: st
           }
         } else {
           const datatype = ele.getAttribute("data-type")
-          let symbol: string | null | undefined
           let v = ele.value.trim()
-          if (datatype === "currency" || datatype === "string-currency") {
-            symbol = ele.getAttribute("data-currency-symbol")
-            if (!symbol) {
-              symbol = currencySymbol
+          if (datatype === "phone" || datatype === "fax") {
+            obj[field] = normalizePhone(v)
+          } else if (datatype === "integer") {
+            if (v) {
+              v = normalizeInteger(v)
+              const val = isNaN(v as any) ? null : parseFloat(v)
+              obj[field] = val
+            } else {
+              obj[field] = undefined
             }
-            if (symbol && symbol.length > 0 && v.indexOf(symbol) >= 0) {
-              v = v.replace(symbol, "")
-            }
-          }
-          if (type === "number" || datatype === "currency" || datatype === "integer" || datatype === "number") {
+          } else if (datatype === "number" || datatype === "currency") {
             const decimalSeparator = getDecimalSeparator(ele)
-            v = decimalSeparator === "," ? v.replace(r2, "") : (v = v.replace(r1, ""))
-            const val = isNaN(v as any) ? null : parseFloat(v)
-            obj[field] = val
+            v = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(v) : removeSeparators(v)
+            if (v) {
+              const val = isNaN(v as any) ? null : parseFloat(v)
+              obj[field] = val
+            } else {
+              obj[field] = undefined
+            }
           } else {
             obj[field] = v
           }
@@ -396,7 +462,7 @@ function decode<T>(form: HTMLFormElement, currencySymbol?: string | null): T {
     if (name != null && name !== "") {
       let nodeName = ele.nodeName
       const type = ele.getAttribute("type")
-      if (nodeName === "INPUT" && type !== null) {
+      if (nodeName === "INPUT" && type != null) {
         nodeName = type.toUpperCase()
       }
       if (nodeName !== "BUTTON" && nodeName !== "RESET" && nodeName !== "SUBMIT" && ele.getAttribute("data-skip") !== "true") {
@@ -448,21 +514,16 @@ function decode<T>(form: HTMLFormElement, currencySymbol?: string | null): T {
           val = d.toString() === "Invalid Date" ? null : d
         }
         const datatype = ele.getAttribute("data-type")
-        let v: any = ele.value
-        let symbol: string | null | undefined
-        if (datatype === "currency" || datatype === "string-currency") {
-          symbol = ele.getAttribute("data-currency-symbol")
-          if (!symbol) {
-            symbol = currencySymbol
-          }
-          if (symbol && symbol.length > 0 && v.indexOf(symbol) >= 0) {
-            v = v.replace(symbol, "")
-          }
-        }
-        if (type === "number" || datatype === "currency" || datatype === "integer" || datatype === "number") {
+        let v = ele.value
+        if (datatype === "phone" || datatype === "fax") {
+          val = normalizePhone(v)
+        } else if (datatype === "integer") {
+          const n0 = normalizeInteger(v)
+          val = isNaN(n0 as any) ? undefined : parseFloat(v)
+        } else if (datatype === "number" || datatype === "currency") {
           const decimalSeparator = getDecimalSeparator(ele)
-          v = decimalSeparator === "," ? v.replace(r2, "") : v.replace(r1, "")
-          val = isNaN(v) ? null : parseFloat(v)
+          const n0 = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(v) : removeSeparators(v)
+          val = isNaN(n0 as any) ? undefined : parseFloat(v)
         }
         setValue(obj, name, val) // obj[name] = val;
       }

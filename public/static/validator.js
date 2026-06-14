@@ -541,7 +541,7 @@ function checkDate(ele, label, resource, dateOnly) {
       } else {
         var d_3 = new Date(ele.min)
         if (!isNaN(d_3.getTime())) {
-          var v2 = dateOnly ? formatDate(d_3, "YYYY-MM-DD") : formatLongDateTime(d_3, "YYYY-MM-DD")
+          var v2 = dateOnly ? formatDate(d_3, "yyyy-MM-dd") : formatLongDateTime(d_3, "yyyy-MM-dd")
           var msg = format(resource.error_from, label, v2)
           addErrorMessage(ele, msg)
           return msg
@@ -594,45 +594,9 @@ function checkDate(ele, label, resource, dateOnly) {
   }
   return null
 }
-function isCommaSeparator(locale) {
-  if (!locale) {
-    return false
-  }
-  return typeof locale === "string" ? locale !== "." : locale.decimalSeparator !== "."
-}
-function correctNumber(v, locale, keepFormat) {
-  var l = v.length
-  if (l === 0) {
-    return v
-  }
-  var arr = []
-  var i = 0
-  if ((v[i] >= "0" && v[i] <= "9") || v[i] === "-") {
-    arr.push(v[i])
-  }
-  if (l === 1) {
-    return arr.join("")
-  }
-  var separator = "."
-  if (isCommaSeparator(locale)) {
-    separator = ","
-    v = v.replace(resources.num2, "")
-  } else {
-    v = v.replace(resources.num1, "")
-  }
-  for (i = 1; i < l; i++) {
-    if ((v[i] >= "0" && v[i] <= "9") || v[i] == separator) {
-      arr.push(v[i])
-    }
-  }
-  var r = arr.join("")
-  if (keepFormat) {
-    return r
-  }
-  if (r.indexOf(",") >= 0) {
-    r = r.replace(",", ".")
-  }
-  return r
+function correctNumber(v, decimalSeparator) {
+  var res = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(v) : removeSeparators(v)
+  return res
 }
 function integerOnFocus(event) {
   var ele = event.currentTarget
@@ -640,7 +604,7 @@ function integerOnFocus(event) {
   if (ele.readOnly || ele.disabled || ele.value.length === 0) {
     return
   } else {
-    var v = removeSeparators(ele.value)
+    var v = normalizeInteger(ele.value)
     if (v !== ele.value) {
       ele.value = v
     }
@@ -653,13 +617,13 @@ function numberOnFocus(event) {
     return
   } else {
     var separator = getDecimalSeparator(ele)
-    var v = correctNumber(ele.value, separator, true)
+    var v = correctNumber(ele.value, separator)
     if (v !== ele.value) {
       ele.value = v
     }
   }
 }
-function validateMinMax(ele, n, label, resource, locale) {
+function validateMinMax(ele, n, label, resource, decimalSeparator) {
   if (ele.min.length > 0) {
     var min = parseFloat(ele.min)
     if (n < min) {
@@ -688,7 +652,7 @@ function validateMinMax(ele, n, label, resource, locale) {
     if (form) {
       var minElement = getElement(form, minField)
       if (minElement) {
-        var smin2 = correctNumber(minElement.value, locale)
+        var smin2 = correctNumber(minElement.value, decimalSeparator)
         if (smin2.length > 0 && !isNaN(smin2)) {
           var min2 = parseFloat(smin2)
           if (n < min2) {
@@ -703,7 +667,7 @@ function validateMinMax(ele, n, label, resource, locale) {
   }
   return true
 }
-function checkNumberEvent(event, locale) {
+function checkNumberEvent(event, decimalSeparator) {
   var target = event.currentTarget
   if (!target || target.readOnly || target.disabled) {
     return true
@@ -711,10 +675,10 @@ function checkNumberEvent(event, locale) {
   materialOnBlur(event)
   removeError(target)
   target.value = target.value.trim()
-  return checkNumber(target, locale)
+  return checkNumber(target, decimalSeparator)
 }
-function checkNumber(target, locale, r) {
-  var value = correctNumber(target.value, locale)
+function checkNumber(target, decimalSeparator, r) {
+  var value = correctNumber(target.value, decimalSeparator)
   var label = getLabel(target)
   if (checkRequired(target, label)) {
     return false
@@ -728,7 +692,7 @@ function checkNumber(target, locale, r) {
       return false
     }
     var n = parseFloat(value)
-    if (!validateMinMax(target, n, label, resource, locale)) {
+    if (!validateMinMax(target, n, label, resource, decimalSeparator)) {
       return false
     }
     removeError(target)
@@ -752,7 +716,8 @@ function numberOnBlur(event) {
     var attr = target.getAttribute("data-scale")
     var scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
     var n = parseFloat(v)
-    target.value = formatNumber(n, scale, separator)
+    var groupSeparator = getGroupSeparator(target)
+    target.value = formatNumber(n, scale, separator, groupSeparator)
   }
 }
 function currencyOnBlur(event) {
@@ -763,7 +728,8 @@ function currencyOnBlur(event) {
     var attr = target.getAttribute("data-scale")
     var scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
     var n = parseFloat(v)
-    var value = formatNumber(n, scale, separator)
+    var groupSeparator = getGroupSeparator(target)
+    var value = formatNumber(n, scale, separator, groupSeparator)
     target.value = formatCurrency(value, target)
   }
 }
@@ -786,20 +752,6 @@ function formatCurrency(v, ele) {
     }
   }
 }
-function removeSeparators(input) {
-  if (!input) return ""
-  var len = input.length
-  var buffer = new Array(len)
-  var write = 0
-  for (var i = 0; i < len; i++) {
-    var c = input[i]
-    if (c === " " || c === "\u00A0" || c === "," || c === "." || c === "٬" || c === "$" || c === "€" || c === "£" || c === "¥") {
-      continue
-    }
-    buffer[write++] = c
-  }
-  return write === len ? input : buffer.slice(0, write).join("")
-}
 function formatInteger(v, groupSeparator) {
   if (groupSeparator === void 0) {
     groupSeparator = ","
@@ -812,46 +764,77 @@ function formatInteger(v, groupSeparator) {
   if (n < 1000) {
     return isNegative ? "-" + n : "" + n
   }
-  var result = ""
-  var count = 0
+  var buffer = new Array(32)
+  var i = buffer.length
+  var digitCount = 0
   while (n > 0) {
-    var digit = n % 10
-    n = (n / 10) | 0
-    if (count > 0 && count % 3 === 0) {
-      result = groupSeparator + result
+    if (digitCount > 0 && digitCount % 3 === 0) {
+      buffer[--i] = groupSeparator
     }
-    result = digit + result
-    count++
+    var digit = n % 10
+    buffer[--i] = String.fromCharCode(48 + digit)
+    n = Math.floor(n / 10)
+    digitCount++
   }
-  return isNegative ? "-" + result : result
+  if (isNegative) {
+    buffer[--i] = "-"
+  }
+  return buffer.slice(i).join("")
 }
-function formatNumber(v, scale, d, g) {
-  if (v == null) {
+function formatNumber(v, precision, decimalSeparator, groupSeparator) {
+  if (precision === void 0) {
+    precision = 0
+  }
+  if (v == null || !Number.isFinite(v)) {
     return ""
   }
-  if (!d && !g) {
-    g = ","
-    d = "."
-  } else if (!g) {
-    g = d === "," ? "." : ","
-  }
-  var s = scale === 0 || scale ? v.toFixed(scale) : v.toString()
-  var x = s.split(".", 2)
-  var y = x[0]
-  var arr = []
-  var len = y.length - 1
-  for (var k = 0; k < len; k++) {
-    arr.push(y[len - k])
-    if ((k + 1) % 3 === 0) {
-      arr.push(g)
+  var d = "."
+  var g = ","
+  if (decimalSeparator && groupSeparator) {
+    d = decimalSeparator
+    g = groupSeparator
+  } else if (decimalSeparator && !groupSeparator) {
+    d = decimalSeparator
+    if (d === "٫") {
+      g = "٬"
+    } else {
+      g = d === "," ? "." : ","
     }
   }
-  arr.push(y[0])
-  if (x.length === 1) {
-    return arr.reverse().join("")
-  } else {
-    return arr.reverse().join("") + d + x[1]
+  var negative = v < 0
+  var s = Math.abs(v).toFixed(precision)
+  var dot = s.indexOf(".")
+  var intEnd = dot >= 0 ? dot : s.length
+  var fracLen = dot >= 0 ? s.length - dot - 1 : 0
+  var intLen = intEnd
+  var groups = intLen > 3 ? ((intLen - 1) / 3) | 0 : 0
+  var outLen = (negative ? 1 : 0) + intLen + groups * g.length + (fracLen > 0 ? d.length + fracLen : 0)
+  var out = new Array(outLen)
+  var p = 0
+  if (negative) {
+    out[p++] = "-"
   }
+  var firstGroup = intLen % 3
+  if (firstGroup === 0) {
+    firstGroup = 3
+  }
+  for (var i = 0; i < intLen; i++) {
+    if (i > 0 && (i === firstGroup || (i > firstGroup && (i - firstGroup) % 3 === 0))) {
+      for (var j = 0; j < g.length; j++) {
+        out[p++] = g[j]
+      }
+    }
+    out[p++] = s[i]
+  }
+  if (fracLen > 0) {
+    for (var j = 0; j < d.length; j++) {
+      out[p++] = d[j]
+    }
+    for (var i = dot + 1; i < s.length; i++) {
+      out[p++] = s[i]
+    }
+  }
+  return out.join("")
 }
 function validateOnBlur(event, includeReadOnly) {
   var target = event.target
@@ -862,7 +845,7 @@ function validateOnBlur(event, includeReadOnly) {
   removeError(target)
   validateElement(event.target, undefined, includeReadOnly)
 }
-function validateElement(ele, locale, includeReadOnly) {
+function validateElement(ele, decimalSeparator, includeReadOnly) {
   if (!ele) {
     return null
   }
@@ -945,16 +928,18 @@ function validateElement(ele, locale, includeReadOnly) {
       return msg
     }
   } else if (datatype === "number" || datatype === "integer" || datatype === "currency" || datatype === "string-currency" || datatype === "percentage") {
-    var v = checkNumber(ele, locale, resource)
+    var v = checkNumber(ele, decimalSeparator, resource)
     var separator = getDecimalSeparator(ele)
+    var groupSeparator = getGroupSeparator(ele)
     if (typeof v === "string") {
       var attr = ele.getAttribute("data-scale")
       var scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
       var n = parseFloat(v)
+      var str = formatNumber(n, scale, separator, groupSeparator)
       if (datatype === "currency" || datatype === "string-currency") {
-        ele.value = formatCurrency(value, ele)
+        ele.value = formatCurrency(str, ele)
       } else {
-        ele.value = formatNumber(n, scale, separator)
+        ele.value = str
       }
     }
   } else if (ctype === "date" || ctype === "datetime-local" || ctype === "datetime") {
@@ -1080,7 +1065,7 @@ function isValidForm(form, focusFirst, scroll) {
   }
   return valid
 }
-function validateForm(form, locale, focusFirst, scroll, includeReadOnly) {
+function validateForm(form, decimalSeparator, focusFirst, scroll, includeReadOnly) {
   if (!form) {
     return true
   }
@@ -1098,7 +1083,7 @@ function validateForm(form, locale, focusFirst, scroll, includeReadOnly) {
     if (type === "checkbox" || type === "radio" || type === "submit" || type === "button" || type === "reset") {
       continue
     } else {
-      var msg = validateElement(ele, locale, includeReadOnly)
+      var msg = validateElement(ele, decimalSeparator, includeReadOnly)
       if (msg) {
         if (divMessage && !errorShown) {
           if (!divMessage.classList.contains("alert-error")) {
@@ -1127,12 +1112,12 @@ function validateForm(form, locale, focusFirst, scroll, includeReadOnly) {
   }
   return valid
 }
-function validateElements(elements, locale) {
+function validateElements(elements, decimalSeparator) {
   var valid = true
   var errorCtrl = null
   for (var _i = 0, elements_1 = elements; _i < elements_1.length; _i++) {
     var c = elements_1[_i]
-    if (!validateElement(c, locale)) {
+    if (!validateElement(c, decimalSeparator)) {
       valid = false
       if (!errorCtrl) {
         errorCtrl = c

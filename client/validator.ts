@@ -1,10 +1,3 @@
-interface Locale {
-  decimalSeparator: string
-  groupSeparator: string
-  currencyCode: string
-  currencySymbol: string
-  currencyPattern: number
-}
 function addErrorMessage(ele: HTMLElement | null | undefined, msg?: string, directParent?: boolean): void {
   if (!ele) {
     return
@@ -555,7 +548,7 @@ function checkDate(ele: HTMLInputElement, label: string, resource: StringMap, da
       } else {
         const d = new Date(ele.min)
         if (!isNaN(d.getTime())) {
-          const v2 = dateOnly ? formatDate(d, "YYYY-MM-DD") : formatLongDateTime(d, "YYYY-MM-DD")
+          const v2 = dateOnly ? formatDate(d, "yyyy-MM-dd") : formatLongDateTime(d, "yyyy-MM-dd")
           let msg = format(resource.error_from, label, v2)
           addErrorMessage(ele, msg)
           return msg
@@ -609,45 +602,9 @@ function checkDate(ele: HTMLInputElement, label: string, resource: StringMap, da
 
   return null
 }
-function isCommaSeparator(locale?: Locale | null | string) {
-  if (!locale) {
-    return false
-  }
-  return typeof locale === "string" ? locale !== "." : locale.decimalSeparator !== "."
-}
-function correctNumber(v: string, locale?: Locale | null | string, keepFormat?: boolean): string {
-  const l = v.length
-  if (l === 0) {
-    return v
-  }
-  const arr: string[] = []
-  let i = 0
-  if ((v[i] >= "0" && v[i] <= "9") || v[i] === "-") {
-    arr.push(v[i])
-  }
-  if (l === 1) {
-    return arr.join("")
-  }
-  let separator = "."
-  if (isCommaSeparator(locale)) {
-    separator = ","
-    v = v.replace(resources.num2, "")
-  } else {
-    v = v.replace(resources.num1, "")
-  }
-  for (i = 1; i < l; i++) {
-    if ((v[i] >= "0" && v[i] <= "9") || v[i] == separator) {
-      arr.push(v[i])
-    }
-  }
-  let r = arr.join("")
-  if (keepFormat) {
-    return r
-  }
-  if (r.indexOf(",") >= 0) {
-    r = r.replace(",", ".")
-  }
-  return r
+function correctNumber(v: string, decimalSeparator?: string | null): string {
+  const res = decimalSeparator === "," || decimalSeparator === "٫" ? normalizeNumber(v) : removeSeparators(v)
+  return res
 }
 
 function integerOnFocus(event: Event): void {
@@ -656,7 +613,7 @@ function integerOnFocus(event: Event): void {
   if (ele.readOnly || ele.disabled || ele.value.length === 0) {
     return
   } else {
-    const v = removeSeparators(ele.value)
+    const v = normalizeInteger(ele.value)
     if (v !== ele.value) {
       ele.value = v
     }
@@ -669,13 +626,13 @@ function numberOnFocus(event: Event): void {
     return
   } else {
     const separator = getDecimalSeparator(ele)
-    const v = correctNumber(ele.value, separator, true)
+    const v = correctNumber(ele.value, separator)
     if (v !== ele.value) {
       ele.value = v
     }
   }
 }
-function validateMinMax(ele: HTMLInputElement, n: number, label: string, resource: StringMap, locale?: Locale | null | string): boolean {
+function validateMinMax(ele: HTMLInputElement, n: number, label: string, resource: StringMap, decimalSeparator?: string | null): boolean {
   if (ele.min.length > 0) {
     const min = parseFloat(ele.min)
     if (n < min) {
@@ -704,7 +661,7 @@ function validateMinMax(ele: HTMLInputElement, n: number, label: string, resourc
     if (form) {
       const minElement = getElement(form, minField) as HTMLInputElement
       if (minElement) {
-        let smin2 = correctNumber(minElement.value, locale) // const smin2 = minElement.value.replace(this._nreg, '');
+        let smin2 = correctNumber(minElement.value, decimalSeparator) // const smin2 = minElement.value.replace(this._nreg, '');
         if (smin2.length > 0 && !isNaN(smin2 as any)) {
           const min2 = parseFloat(smin2)
           if (n < min2) {
@@ -719,7 +676,7 @@ function validateMinMax(ele: HTMLInputElement, n: number, label: string, resourc
   }
   return true
 }
-function checkNumberEvent(event: Event, locale?: Locale | string | null): boolean | string {
+function checkNumberEvent(event: Event, decimalSeparator?: string | null): boolean | string {
   const target = event.currentTarget as HTMLInputElement
   if (!target || target.readOnly || target.disabled) {
     return true
@@ -727,10 +684,10 @@ function checkNumberEvent(event: Event, locale?: Locale | string | null): boolea
   materialOnBlur(event)
   removeError(target)
   target.value = target.value.trim()
-  return checkNumber(target, locale)
+  return checkNumber(target, decimalSeparator)
 }
-function checkNumber(target: HTMLInputElement, locale?: Locale | string | null, r?: StringMap): boolean | string {
-  const value = correctNumber(target.value, locale)
+function checkNumber(target: HTMLInputElement, decimalSeparator?: string | null, r?: StringMap): boolean | string {
+  const value = correctNumber(target.value, decimalSeparator)
   const label = getLabel(target)
   if (checkRequired(target, label)) {
     return false
@@ -744,7 +701,7 @@ function checkNumber(target: HTMLInputElement, locale?: Locale | string | null, 
       return false
     }
     const n = parseFloat(value)
-    if (!validateMinMax(target, n, label, resource, locale)) {
+    if (!validateMinMax(target, n, label, resource, decimalSeparator)) {
       return false
     }
     removeError(target)
@@ -768,7 +725,8 @@ function numberOnBlur(event: Event) {
     const attr = target.getAttribute("data-scale")
     const scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
     const n = parseFloat(v)
-    target.value = formatNumber(n, scale, separator)
+    const groupSeparator = getGroupSeparator(target)
+    target.value = formatNumber(n, scale, separator, groupSeparator)
   }
 }
 function currencyOnBlur(event: Event) {
@@ -779,7 +737,8 @@ function currencyOnBlur(event: Event) {
     const attr = target.getAttribute("data-scale")
     const scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
     const n = parseFloat(v)
-    const value = formatNumber(n, scale, separator)
+    const groupSeparator = getGroupSeparator(target)
+    const value = formatNumber(n, scale, separator, groupSeparator)
     target.value = formatCurrency(value, target)
   }
 }
@@ -802,38 +761,7 @@ function formatCurrency(v: string, ele: HTMLInputElement): string {
     }
   }
 }
-function removeSeparators(input?: string | null): string {
-  if (!input) return ""
-
-  const len = input.length
-  const buffer = new Array<string>(len)
-  let write = 0
-
-  for (let i = 0; i < len; i++) {
-    const c = input[i]
-
-    // skip unwanted characters
-    if (
-      c === " " || // normal space
-      c === "\u00A0" || // non-breaking space
-      c === "," ||
-      c === "." ||
-      c === "٬" || // Arabic thousands separator
-      c === "$" ||
-      c === "€" ||
-      c === "£" ||
-      c === "¥"
-    ) {
-      continue
-    }
-
-    buffer[write++] = c
-  }
-
-  // Avoid creating a large intermediate array via slice
-  return write === len ? input : buffer.slice(0, write).join("")
-}
-function formatInteger(v?: number | null, groupSeparator: string = ","): string {
+function formatInteger(v: number | null | undefined, groupSeparator: string = ","): string {
   if (v == null || !Number.isFinite(v)) {
     return ""
   }
@@ -841,55 +769,106 @@ function formatInteger(v?: number | null, groupSeparator: string = ","): string 
   const isNegative = v < 0
   let n = Math.abs(Math.trunc(v))
 
-  // Fast path for small numbers (no separator needed)
+  // Fast path
   if (n < 1000) {
     return isNegative ? `-${n}` : `${n}`
   }
 
-  let result = ""
-  let count = 0
+  // Max length:
+  // digits (up to 16 for JS safe int) + separators (~5) + sign
+  const buffer = new Array(32)
+  let i = buffer.length
+
+  let digitCount = 0
 
   while (n > 0) {
-    const digit = n % 10
-    n = (n / 10) | 0 // faster floor for positive integers
-
-    if (count > 0 && count % 3 === 0) {
-      result = groupSeparator + result
+    // Insert separator every 3 digits
+    if (digitCount > 0 && digitCount % 3 === 0) {
+      buffer[--i] = groupSeparator
     }
 
-    result = digit + result
-    count++
+    const digit = n % 10
+    buffer[--i] = String.fromCharCode(48 + digit)
+
+    n = Math.floor(n / 10) // safe version
+    digitCount++
   }
 
-  return isNegative ? `-${result}` : result
+  if (isNegative) {
+    buffer[--i] = "-"
+  }
+
+  // Slice only used portion and join once
+  return buffer.slice(i).join("")
 }
-function formatNumber(v?: number | null, scale?: number, d?: string | null, g?: string): string {
-  if (v == null) {
+function formatNumber(v?: number | null, precision = 0, decimalSeparator?: string | null, groupSeparator?: string | null): string {
+  if (v == null || !Number.isFinite(v)) {
     return ""
   }
-  if (!d && !g) {
-    g = ","
-    d = "."
-  } else if (!g) {
-    g = d === "," ? "." : ","
-  }
-  const s = scale === 0 || scale ? v.toFixed(scale) : v.toString()
-  const x = s.split(".", 2)
-  const y = x[0]
-  const arr: string[] = []
-  const len = y.length - 1
-  for (let k = 0; k < len; k++) {
-    arr.push(y[len - k])
-    if ((k + 1) % 3 === 0) {
-      arr.push(g)
+  let d = "."
+  let g = ","
+  if (decimalSeparator && groupSeparator) {
+    d = decimalSeparator
+    g = groupSeparator
+  } else if (decimalSeparator && !groupSeparator) {
+    d = decimalSeparator
+    if (d === "٫") {
+      g = "٬"
+    } else {
+      g = d === "," ? "." : ","
     }
   }
-  arr.push(y[0])
-  if (x.length === 1) {
-    return arr.reverse().join("")
-  } else {
-    return arr.reverse().join("") + d + x[1]
+  const negative = v < 0
+
+  // unavoidable allocation
+  const s = Math.abs(v).toFixed(precision)
+
+  const dot = s.indexOf(".")
+
+  const intEnd = dot >= 0 ? dot : s.length
+  const fracLen = dot >= 0 ? s.length - dot - 1 : 0
+
+  const intLen = intEnd
+  const groups = intLen > 3 ? ((intLen - 1) / 3) | 0 : 0
+
+  const outLen = (negative ? 1 : 0) + intLen + groups * g.length + (fracLen > 0 ? d.length + fracLen : 0)
+
+  const out = new Array<string>(outLen)
+
+  let p = 0
+
+  if (negative) {
+    out[p++] = "-"
   }
+
+  // integer part
+  let firstGroup = intLen % 3
+  if (firstGroup === 0) {
+    firstGroup = 3
+  }
+
+  for (let i = 0; i < intLen; i++) {
+    if (i > 0 && (i === firstGroup || (i > firstGroup && (i - firstGroup) % 3 === 0))) {
+      for (let j = 0; j < g.length; j++) {
+        out[p++] = g[j]
+      }
+    }
+
+    out[p++] = s[i]
+  }
+
+  // fractional part
+  if (fracLen > 0) {
+    for (let j = 0; j < d.length; j++) {
+      out[p++] = d[j]
+    }
+
+    for (let i = dot + 1; i < s.length; i++) {
+      out[p++] = s[i]
+    }
+  }
+
+  return out.join("")
 }
 
 function validateOnBlur(event: Event, includeReadOnly?: boolean): void {
@@ -901,7 +880,7 @@ function validateOnBlur(event: Event, includeReadOnly?: boolean): void {
   removeError(target)
   validateElement(event.target as HTMLInputElement, undefined, includeReadOnly)
 }
-function validateElement(ele: HTMLInputElement, locale?: Locale | string | null, includeReadOnly?: boolean): string | null {
+function validateElement(ele: HTMLInputElement, decimalSeparator?: string | null, includeReadOnly?: boolean): string | null {
   if (!ele) {
     return null
   }
@@ -991,16 +970,18 @@ function validateElement(ele: HTMLInputElement, locale?: Locale | string | null,
       return msg
     }
   } else if (datatype === "number" || datatype === "integer" || datatype === "currency" || datatype === "string-currency" || datatype === "percentage") {
-    const v = checkNumber(ele, locale, resource)
+    const v = checkNumber(ele, decimalSeparator, resource)
     const separator = getDecimalSeparator(ele)
+    const groupSeparator = getGroupSeparator(ele)
     if (typeof v === "string") {
       const attr = ele.getAttribute("data-scale")
       const scale = attr && attr.length > 0 ? parseInt(attr, 10) : undefined
       const n = parseFloat(v)
+      const str = formatNumber(n, scale, separator, groupSeparator)
       if (datatype === "currency" || datatype === "string-currency") {
-        ele.value = formatCurrency(value, ele)
+        ele.value = formatCurrency(str, ele)
       } else {
-        ele.value = formatNumber(n, scale, separator)
+        ele.value = str
       }
     }
   } else if (ctype === "date" || ctype === "datetime-local" || ctype === "datetime") {
@@ -1128,7 +1109,7 @@ function isValidForm(form: HTMLFormElement, focusFirst?: boolean, scroll?: boole
   }
   return valid
 }
-function validateForm(form?: HTMLFormElement, locale?: Locale | string | null, focusFirst?: boolean, scroll?: boolean, includeReadOnly?: boolean): boolean {
+function validateForm(form?: HTMLFormElement, decimalSeparator?: string | null, focusFirst?: boolean, scroll?: boolean, includeReadOnly?: boolean): boolean {
   if (!form) {
     return true
   }
@@ -1146,7 +1127,7 @@ function validateForm(form?: HTMLFormElement, locale?: Locale | string | null, f
     if (type === "checkbox" || type === "radio" || type === "submit" || type === "button" || type === "reset") {
       continue
     } else {
-      const msg = validateElement(ele, locale, includeReadOnly)
+      const msg = validateElement(ele, decimalSeparator, includeReadOnly)
       if (msg) {
         if (divMessage && !errorShown) {
           if (!divMessage.classList.contains("alert-error")) {
@@ -1175,11 +1156,11 @@ function validateForm(form?: HTMLFormElement, locale?: Locale | string | null, f
   }
   return valid
 }
-function validateElements(elements: HTMLInputElement[], locale?: Locale | string | null): boolean {
+function validateElements(elements: HTMLInputElement[], decimalSeparator?: string | null): boolean {
   let valid = true
   let errorCtrl: HTMLInputElement | null = null
   for (const c of elements) {
-    if (!validateElement(c, locale)) {
+    if (!validateElement(c, decimalSeparator)) {
       valid = false
       if (!errorCtrl) {
         errorCtrl = c
