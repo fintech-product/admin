@@ -6,8 +6,8 @@ import { vi as adminVI } from "./admin/vi"
 import { en as authenticationEN } from "./authentication/en"
 import { vi as authenticationVI } from "./authentication/vi"
 
-import { en as contentEN } from "./content/en"
-import { vi as contentVI } from "./content/vi"
+import { en as countryEN } from "./country/en"
+import { vi as countryVI } from "./country/vi"
 
 import { en as commonEN } from "./en"
 import { vi as commonVI } from "./vi"
@@ -28,13 +28,13 @@ const en: StringMap = {
   ...commonEN,
   ...authenticationEN,
   ...adminEN,
-  ...contentEN,
+  ...countryEN,
 }
 const vi: StringMap = {
   ...commonVI,
   ...authenticationVI,
   ...adminVI,
-  ...contentVI,
+  ...countryVI,
 }
 
 export const resources: Resources = {
@@ -42,7 +42,10 @@ export const resources: Resources = {
   vi: vi,
 }
 
-export function getDateFormat(lang?: string): string {
+export function getDateFormat(lang?: string, dateFormat?: string): string {
+  if (dateFormat) {
+    return dateFormat
+  }
   if (!lang) {
     return enLocale.dateFormat
   }

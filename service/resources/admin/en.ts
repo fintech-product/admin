@@ -4,6 +4,8 @@ export const en = {
   user_list: "Search users",
   users_lookup: "Look Users",
   user_lookup: "Search User",
+  user_info: "User Information",
+  contact_info: "Contact Information",
   position: "Position",
   position_employee: "Employee",
   position_manager: "Manager",
@@ -18,6 +20,7 @@ export const en = {
   role_filter_modules: "Filter modules",
   role_id: "Role Id",
   role_name: "Role Name",
+  remark: "Remark",
   role_system_role: "System Role",
   module: "Module",
 
@@ -26,13 +29,17 @@ export const en = {
   role_assigned_users: "Assigned Users",
   role_roles_assign_to_groups: "Role Assign To Group(s)",
 
+  msg_confirm_assign_roles_to_user: "You do not assign any role to this user. Are you sure you want to save?",
+  msg_confirm_assign_users_to_role: "You do not assign any user to this role. Are you sure you want to save?",
+
+  number: "No.",
   // Audit log
   audit_logs: "Audit logs",
   audit_log_time: "Time",
   audit_log_time_from: "Date time from",
   audit_log_time_to: "Date time to",
   audit_log_user: "Performed by",
-
-  msg_confirm_assign_roles_to_user: "You do not assign any role to this user. Are you sure you want to save?",
-  msg_confirm_assign_users_to_role: "You do not assign any user to this role. Are you sure you want to save?",
+  action: "Action",
+  resource: "Resource",
+  ip: "IP",
 }

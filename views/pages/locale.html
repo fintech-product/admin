@@ -98,7 +98,7 @@
         min="1"
         max="7"
         required
-        onkeypress="return integerOnKeyPress(event)"
+        onkeydown="return digitOnKeyDown(event)"
         onfocus="numberOnFocus(event)"
         onblur="numberOnBlur(event)"
         placeholder="{{resource.first_day_of_week}}"
@@ -182,7 +182,7 @@
         min="0"
         max="4"
         required
-        onkeypress="return integerOnKeyPress(event)"
+        onkeydown="return digitOnKeyDown(event)"
         onfocus="numberOnFocus(event)"
         onblur="numberOnBlur(event)"
         placeholder="{{resource.currency_decimal_digits}}"
@@ -201,7 +201,7 @@
         min="0"
         max="3"
         required
-        onkeypress="return integerOnKeyPress(event)"
+        onkeydown="return digitOnKeyDown(event)"
         onfocus="numberOnFocus(event)"
         onblur="numberOnBlur(event)"
         placeholder="{{resource.currency_pattern}}"
