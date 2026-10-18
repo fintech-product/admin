@@ -13,8 +13,8 @@ import {
   hasSearch,
   isSuccessful,
   resources,
-  respondError
-} from "express-core-web"
+  respondError,
+} from "express-web-kit"
 import { write } from "security-express"
 import { validate } from "validation-core"
 import { getLang, getResource } from "../resources"
@@ -42,7 +42,10 @@ const positions = [
 const fields = ["userId", "username", "email", "displayName", "status"]
 
 export class UserController {
-  constructor(private service: UserService, private roleQuery: RoleQuery) {
+  constructor(
+    private service: UserService,
+    private roleQuery: RoleQuery,
+  ) {
     this.search = this.search.bind(this)
     this.view = this.view.bind(this)
     this.submit = this.submit.bind(this)

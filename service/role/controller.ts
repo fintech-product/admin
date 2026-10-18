@@ -13,8 +13,8 @@ import {
   hasSearch,
   isSuccessful,
   resources,
-  respondError
-} from "express-core-web"
+  respondError,
+} from "express-web-kit"
 import { write } from "security-express"
 import { validate } from "validation-core"
 import { getLang, getResource } from "../resources"
@@ -30,7 +30,10 @@ function createRole(): Role {
   return role
 }
 export class RoleController {
-  constructor(private service: RoleService, private userService: UserService) {
+  constructor(
+    private service: RoleService,
+    private userService: UserService,
+  ) {
     this.search = this.search.bind(this)
     this.view = this.view.bind(this)
     this.submit = this.submit.bind(this)

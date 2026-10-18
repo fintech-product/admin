@@ -13,8 +13,8 @@ import {
   hasSearch,
   isSuccessful,
   resources,
-  respondError
-} from "express-core-web"
+  respondError,
+} from "express-web-kit"
 import { write } from "security-express"
 import { validate } from "validation-core"
 import { getLang, getResource } from "../resources"
@@ -27,7 +27,20 @@ function createCountry(): Country {
   return country
 }
 
-const fields = ["countryCode", "countryName", "nativeCountryName", "dateFormat", "groupSeparator", "groupSeparator", "currencyCode", "currencySymbol", "currencyDecimalDigits", "currencyPattern", "currencySample", "status"]
+const fields = [
+  "countryCode",
+  "countryName",
+  "nativeCountryName",
+  "dateFormat",
+  "groupSeparator",
+  "groupSeparator",
+  "currencyCode",
+  "currencySymbol",
+  "currencyDecimalDigits",
+  "currencyPattern",
+  "currencySample",
+  "status",
+]
 export class CountryController {
   constructor(private service: CountryService) {
     this.search = this.search.bind(this)

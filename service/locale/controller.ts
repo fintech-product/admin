@@ -13,8 +13,8 @@ import {
   hasSearch,
   isSuccessful,
   resources,
-  respondError
-} from "express-core-web"
+  respondError,
+} from "express-web-kit"
 import { write } from "security-express"
 import { validate } from "validation-core"
 import { getLang, getResource } from "../resources"
