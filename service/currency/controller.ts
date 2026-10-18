@@ -66,7 +66,7 @@ export class CurrencyController {
   async view(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    const id = req.params.id
+    const id = req.params.id as string
     const editMode = id !== "new"
     const permissions = res.locals.permissions as number
     const readonly = write != (write & permissions)

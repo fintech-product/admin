@@ -85,7 +85,7 @@ export class UserController {
   async view(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    const id = req.params.id
+    const id = req.params.id as string
     const editMode = id !== "new"
     const permissions = res.locals.permissions as number
     const readonly = write != (write & permissions)
@@ -148,7 +148,7 @@ export class UserController {
   async renderAssign(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    const id = req.params.id
+    const id = req.params.id as string
     try {
       const user = await this.service.load(id)
       if (!user) {
@@ -173,7 +173,7 @@ export class UserController {
     }
   }
   async assign(req: Request, res: Response) {
-    const id = req.params.id
+    const id = req.params.id as string
     const roles = req.body as string[]
     try {
       await this.service.assign(id, roles)
