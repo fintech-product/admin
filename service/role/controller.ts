@@ -43,7 +43,10 @@ export class RoleController {
   async search(req: Request, res: Response) {
     const lang = getLang(req, res)
     const resource = getResource(lang)
-    let filter: RoleFilter = { limit: resources.defaultLimit }
+    let filter: RoleFilter = {
+      q: "",
+      limit: resources.defaultLimit,
+    }
     if (hasSearch(req)) {
       filter = fromRequest<RoleFilter>(req, ["status"])
     }
